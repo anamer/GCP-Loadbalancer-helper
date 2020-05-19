@@ -4,7 +4,7 @@ This repository includes helper scripts for the GCP Certificate Authority Servic
 
 ## Renew Load-Balancers self-managed certifications in a project
 
-Usage: 
+Usage:
 ```sh
-private-ca-renew-gclb.py <project-id> <private ca subordinate name>
+private_ca_renew_lb_in_project.py <project-id> <private ca subordinate name>
 ```
