@@ -16,7 +16,6 @@ from cryptography.hazmat.backends import default_backend
 
 import googleapiclient.discovery
 from six.moves import input
-from google.cloud import storage
 from pprint import pprint
 from private_ca_functions import *
 
@@ -75,13 +74,13 @@ def main(project , subordinate_name):
         for target_https_proxy in response['items']:
             # TODO: Change code below to process each `target_https_proxy` resource:
             # get cert list from https-proxy
-            pprint(target_https_proxy)
+            #pprint(target_https_proxy)
             ssl_certificate_list = target_https_proxy[u'sslCertificates']
             # process each cert in cert list
             for cert_name in ssl_certificate_list:
                 #print cert_name
                 cert_name = cert_name.split("/")[-1]
-                print (cert_name)
+                #print (cert_name)
                 cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
                 print ("Cert: {} , creation: {} ,expire: {}".format(cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime)) # + " creation: " + creation
 
@@ -123,7 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('subordinate_name', help='Issuer Subordinate CA')
 
     args = parser.parse_args()
-    print (args.subordinate_name)
+    #print (args.subordinate_name)
 
 
     main(args.project_id , args.subordinate_name)

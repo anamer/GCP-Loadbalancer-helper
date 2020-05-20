@@ -2,29 +2,27 @@ from pprint import pprint
 import os
 
 def private_ca_list_ssl_certs(service, project):
-
     # List certs
     request = service.sslCertificates().list(project=project)
     while request is not None:
         response = request.execute()
-
         for ssl_certificate in response['items']:
             # TODO: Change code below to process each `ssl_certificate` resource:
             pprint(ssl_certificate)
-
         request = service.sslCertificates().list_next(previous_request=request, previous_response=response)
 
     # TODO: Change code below to process the `response` dict:
     pprint(response)
     return response
 
+
 def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert_data, private_key_data):
     ssl_certificate_body = {
         "name": cert_name,
         "description": "creating new lb ssl cert",
-        "certificate": cert_data, #cert,
-        "privateKey": private_key_data, #private_key,
-        #"managed": {
+        "certificate": cert_data,  # cert,
+        "privateKey": private_key_data,  # private_key,
+        # "managed": {
         #    "domains": [
         #    string
         #    ],
