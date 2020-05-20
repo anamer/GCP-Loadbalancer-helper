@@ -3,9 +3,9 @@
 This repository includes helper scripts for the GCP Certificate Authority Service.
 
 ## Installation
-pip3 install -r requirements.txt
 ```sh
- export CLOUDSDK_PYTHON_SITEPACKAGES=1;
+pip3 install -r requirements.txt
+export CLOUDSDK_PYTHON_SITEPACKAGES=1;
  ```
 
 ## Renew Load-Balancers self-managed certifications in a project
