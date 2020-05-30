@@ -1,0 +1,11 @@
+ssl_resources:
+  "load-balancer":
+    type: "GLB" #Global Load Balancer
+    name: "demo-lb-target-proxy"
+    subordinate-ca: "server-tls-2"
+    cert_renew_ratio: 70
+  "load-balancer-2":
+    type: "ILB" # Internal Load Balancer
+    name: "demo-lb-target-proxy"
+    subordinate-ca: "server-tls-2"
+    cert_renew_ratio: 70
