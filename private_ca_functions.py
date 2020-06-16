@@ -1,4 +1,5 @@
 from pprint import pprint
+from datetime import datetime
 import os
 
 def private_ca_list_ssl_certs(service, project):
@@ -82,3 +83,31 @@ def execute_shell_command(bashCommand):
     # TODO: Add try - catch, consider subprocess
     print (bashCommand)
     os.system(bashCommand)
+
+def get_cert_dates(service, project, cert_name):
+    cert_request = service.sslCertificates().get(project=project, sslCertificate=cert_name)
+    cert_response = cert_request.execute()
+    expire = cert_response[u'expireTime']
+    creation = cert_response[u'creationTimestamp']
+    date_format = "%Y-%m-%dT%H:%M:%S"
+
+    # Parse cert epiration date to datetime format
+    cert_expiration_date = cert_response[u'expireTime']
+    split_string = cert_expiration_date.split(".", 1)
+    cert_expiration_date = split_string[0]
+    #print cert_expiration_date
+    cert_expiration_date_in_datetime = datetime.strptime(cert_expiration_date, date_format)
+    cert_expi_for_print = cert_expiration_date_in_datetime.strftime("%m/%d/%Y, %H:%M:%S")
+    #print ("Cert Expiration Date2: ")
+    #print (cert_expiration_date_in_datetime)
+
+    cert_creation_date = cert_response[u'creationTimestamp']
+    split_string = cert_creation_date.split(".", 1)
+    cert_creation_date = split_string[0]
+    cert_creation_date_in_datetime = datetime.strptime(cert_creation_date, date_format)
+    cert_creation_for_print = cert_creation_date_in_datetime.strftime("%m/%d/%Y, %H:%M:%S")
+    #print ("Cert Creation Date: ")
+    #print (cert_creation_date_in_datetime)
+
+    #return cert_response[u'expireTime'], cert_response[u'creationTimestamp']
+    return cert_expiration_date_in_datetime , cert_creation_date_in_datetime

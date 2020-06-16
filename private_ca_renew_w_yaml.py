@@ -1,6 +1,5 @@
-
-###################################################################################
-# usage: private-ca-renew-gclb.py <project-id> <private ca subordinate name>
+##################################################################################
+# usage: private-ca-renew-w_yaml.py <project-id> <YAML File>
 # This script assumes all Google Load balancer certs in a project are self-manged.
 # The script scans all LBs in a project and renew LB cert if the remaining life-time
 # of the cert is lower than a ratio (REMAIN_CERT_LIFE_TIME_RATIO)
@@ -9,10 +8,11 @@
 import argparse
 import time
 import subprocess
+import yaml
 from datetime import datetime
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-#import datetime
+
 
 import googleapiclient.discovery
 from six.moves import input
@@ -28,12 +28,31 @@ REMAIN_CERT_LIFE_TIME_RATIO = 10
 
 
 
+
 # [START run]
-def main(project , subordinate_name):
+def main(project , yaml_file):
     service = googleapiclient.discovery.build('compute', 'v1')
 
-    #issue_cert_from_private_ca_subordinate(service, project, 'server-tls-2' , cert_name = 'cert-2')
-    #private_ca_list_ssl_certs(service, project)
+    #parse YAML file
+    f = open(yaml_file)
+    data = yaml.safe_load(f)
+    f.close()
+
+    print (data)
+
+    for item_in_yaml in data['ssl_resources']:
+        print (item_in_yaml)
+        name = data['ssl_resources'][item_in_yaml]['name']
+        type = data['ssl_resources'][item_in_yaml]['type']
+        print (name)
+        print (type)
+
+    # Process resources types
+        if type == 'GLB':
+            print ("Procssing {} GLB".format(name))
+            #read GLB
+            #read SSL cert
+
 
     # read all LB in the project
     request = service.targetHttpsProxies().list(project=project)
@@ -53,31 +72,6 @@ def main(project , subordinate_name):
                 cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
                 print ("Cert: {} , creation: {} ,expire: {}".format(cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime)) # + " creation: " + creation
 
-                # Calc remining life of cert, i.e.: cert-expiraton-date (minus) now, keep result in seconds
-                now = datetime.now()
-                duration = cert_expiration_date_in_datetime - now
-                cert_remaining_time_in_sec = duration.total_seconds()
-                print ("cert_remaining_time_in_sec = {} ".format(cert_remaining_time_in_sec))
-
-                # Calc cert life-time, i.e.: cert-expiraton-date (minus) cert expiration date , keep result in seconds
-                duration = cert_expiration_date_in_datetime - cert_creation_date_in_datetime
-                cert_total_life_time_in_sec = duration.total_seconds()
-                print ("cert_life_time_in_sec = {} ".format(cert_total_life_time_in_sec))
-
-                # Renew LB cert if cert has expired (i.e.: cert_remaining_time_in_sec is negative number ) or when cert_life_time_in_sec is below remain_cert_life_time_ratio
-
-                if (cert_remaining_time_in_sec<0) or (cert_remaining_time_in_sec*100/cert_total_life_time_in_sec < REMAIN_CERT_LIFE_TIME_RATIO):
-                    # Issue new cert, create LB SSL and install new SSL to LB.
-                    print ("Renewing SSL cert for LB " + target_https_proxy[u'name'])
-
-                    _new_cert_name = "cert-" + datetime.now().strftime("%Y%m%d%H%M%S")
-
-                    private_ca_issue_cert_from_subordinate(service, project, subordinate_name , cert_name = _new_cert_name )
-                    # Update LB's cert
-                    private_ca_update_target_https_proxy_ssl (service, project, target_https_proxy[u'name'] , _new_cert_name)
-
-
-
         request = service.targetHttpsProxies().list_next(previous_request=request, previous_response=response)
 
 
@@ -88,11 +82,11 @@ if __name__ == '__main__':
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('project_id', help='Your Google Cloud project ID.')
-    parser.add_argument('subordinate_name', help='Issuer Subordinate CA')
+    parser.add_argument('yaml_file', help='Path to YAMl file')
 
     args = parser.parse_args()
     #print (args.subordinate_name)
 
 
-    main(args.project_id , args.subordinate_name)
+    main(args.project_id , args.yaml_file)
 # [END run]

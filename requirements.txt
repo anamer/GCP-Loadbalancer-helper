@@ -1,3 +1,4 @@
 cryptography>=2.2.0
 google-api-python-client
 google-cloud
+pyyaml
