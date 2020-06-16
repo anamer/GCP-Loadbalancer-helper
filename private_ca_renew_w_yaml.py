@@ -44,6 +44,8 @@ def main(project , yaml_file):
         print (item_in_yaml)
         name = data['ssl_resources'][item_in_yaml]['name']
         type = data['ssl_resources'][item_in_yaml]['type']
+        subordinate_ca = data['ssl_resources'][item_in_yaml]['subordinate-ca']
+        cert_renew_ratio = data['ssl_resources'][item_in_yaml]['subordinate-ca']
         print (name)
         print (type)
 
@@ -51,9 +53,25 @@ def main(project , yaml_file):
         if type == 'GLB':
             print ("Procssing {} GLB".format(name))
             #read GLB
+            response = private_ca_read_global_target_https(service, project, "demo-lb-target-proxy" )
             #read SSL cert
+            ssl_certificate_list = response[u'sslCertificates']
+            # process each cert in cert list
+            for cert_name in ssl_certificate_list:
+                print (cert_name)
+                cert_name = cert_name.split("/")[-1]
+                #print (cert_name)
+                cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
+                print ("Cert: {} , creation: {} ,expire: {}".format(cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime)) # + " creation: " + creation
+                if (cert_remaining_time_in_sec<0) or (cert_remaining_time_in_sec*100/cert_total_life_time_in_sec < REMAIN_CERT_LIFE_TIME_RATIO):
+                    # Issue new cert, create LB SSL and install new SSL to LB.
+                    print ("Renewing SSL cert for LB " + name)
+                    _new_cert_name = "cert-" + datetime.now().strftime("%Y%m%d%H%M%S")
+                    private_ca_issue_cert_from_subordinate(service, project, subordinate_name , cert_name = _new_cert_name )
+                    # Update LB's cert
+                    private_ca_update_target_https_proxy_ssl (service, project, target_https_proxy[u'name'] , _new_cert_name)
 
-
+    exit (1)
     # read all LB in the project
     request = service.targetHttpsProxies().list(project=project)
     while request is not None:

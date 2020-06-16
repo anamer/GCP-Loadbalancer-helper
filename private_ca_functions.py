@@ -16,6 +16,7 @@ def private_ca_list_ssl_certs(service, project):
     pprint(response)
     return response
 
+#def private_ca_issue_an_apply_cert(service, project, subordinate_name)
 
 def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert_data, private_key_data):
     ssl_certificate_body = {
@@ -40,6 +41,17 @@ def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert
     request = service.sslCertificates().insert(project=project, body=ssl_certificate_body)
     response = request.execute()
     pprint (response)
+    #ToDo return response
+
+
+def private_ca_read_global_target_https(service, project, target_https_target_name):
+    request = service.targetHttpsProxies().get(project=project, targetHttpsProxy=target_https_target_name)
+    response = request.execute()
+
+    # TODO: Change code below to process the `response` dict:
+    pprint(response)
+    return response
+
 
 
 
