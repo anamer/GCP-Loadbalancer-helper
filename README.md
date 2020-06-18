@@ -1,6 +1,6 @@
 # GCP-CA-Service-Helper-Scripts
 
-This repository includes helper scripts for the GCP Certificate Authority Service.
+This repository includes helper scripts for the Google Cloud Certificate Authority Service.
 
 ## Installation
 ```sh
