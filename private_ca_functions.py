@@ -86,6 +86,12 @@ def private_ca_issue_LB_cert_from_subordinate(service, project, private_ca_subod
     # Now that we have cert and private_key create a new LB SSL-cert
     private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, _temp_cert, _temp_key)
 
+    #remobe temo cert and _temp_key
+    os.remove("cert.crt")
+    os.remove("key")
+
+
+
 def private_ca_update_target_https_proxy_ssl (service, project, https_proxy_name, cert_name):
     #TODO: to be replaced with Python SDK
     _shell_command = "gcloud compute target-https-proxies update " + https_proxy_name + " --ssl-certificates=" + cert_name

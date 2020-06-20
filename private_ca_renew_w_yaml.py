@@ -66,12 +66,12 @@ def main(project , yaml_file):
                 duration = cert_expiration_date_in_datetime - cert_creation_date_in_datetime
                 cert_total_life_time_in_sec = round(duration.total_seconds())
                 #print ("cert_life_time_in_sec = {} ".format(cert_total_life_time_in_sec))
-                
+
                 #Calc remining life of cert, i.e.: cert-expiraton-date (minus) now, keep result in seconds
                 now = datetime.now()
                 duration = cert_expiration_date_in_datetime - now
                 cert_remaining_time_in_sec = round(duration.total_seconds())
-                
+
                 print ("Resource: {}, Cert: {} , creation: {} ,expire: {} , cert life time in sec: {:,}, remining time in sec: {:,}".format(resource_name, cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime, cert_total_life_time_in_sec , cert_remaining_time_in_sec)) # + " creation: " + creation
                 if (cert_remaining_time_in_sec<0) or (cert_remaining_time_in_sec*100/cert_total_life_time_in_sec < REMAIN_CERT_LIFE_TIME_RATIO):
                     # Issue new cert, create LB SSL and install new SSL to LB.
@@ -85,31 +85,13 @@ def main(project , yaml_file):
                     #read SSL cert
                     ssl_certificate_list = response[u'sslCertificates']
                     print ("Update LB has this SSL cert: " + str(ssl_certificate_list))
+                    if (_new_cert_name in ssl_certificate_list):
+                        print("Updated LB's SSL Cert successfully")
+                    else:
+                        print("ERROR: Could not find new SSL cert in LB!")
                 else:
                     print ("Cert {}, has {}% of its life, skipping cert renewal!".format(resource_name, round((cert_remaining_time_in_sec*100/cert_total_life_time_in_sec),1)))
                     print ("-" * 50)
-
-
-    exit (1)
-    # read all LB in the project
-    request = service.targetHttpsProxies().list(project=project)
-    while request is not None:
-        response = request.execute()
-
-        for target_https_proxy in response['items']:
-            # TODO: Change code below to process each `target_https_proxy` resource:
-            # get cert list from https-proxy
-            #pprint(target_https_proxy)
-            ssl_certificate_list = target_https_proxy[u'sslCertificates']
-            # process each cert in cert list
-            for cert_name in ssl_certificate_list:
-                #print cert_name
-                cert_name = cert_name.split("/")[-1]
-                #print (cert_name)
-                cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
-                print ("Cert: {} , creation: {} ,expire: {}".format(cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime)) # + " creation: " + creation
-
-        request = service.targetHttpsProxies().list_next(previous_request=request, previous_response=response)
 
 
 
