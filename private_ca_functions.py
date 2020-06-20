@@ -49,14 +49,14 @@ def private_ca_read_global_target_https(service, project, target_https_target_na
     response = request.execute()
 
     # TODO: Change code below to process the `response` dict:
-    pprint(response)
+    #pprint(response)
     return response
 
 
 
 
 
-def private_ca_issue_cert_from_subordinate(service, project, private_ca_subodinate, cert_name, location = "us-west1", san = "www.joonix.net", reusable_config = "leaf-server-tls"):
+def private_ca_issue_LB_cert_from_subordinate(service, project, private_ca_subodinate, cert_name, location = "us-west1", san = "www.joonix.net", reusable_config = "leaf-server-tls"):
     # given a project name, private ca subordinate and desired cert_name issue new cert
 
     print ("Issue new cert from issuer {}, cert name {} - 2".format(private_ca_subodinate, cert_name))

@@ -72,7 +72,7 @@ def main(project , subordinate_name):
 
                     _new_cert_name = "cert-" + datetime.now().strftime("%Y%m%d%H%M%S")
 
-                    private_ca_issue_cert_from_subordinate(service, project, subordinate_name , cert_name = _new_cert_name )
+                    private_ca_issue_LB_cert_from_subordinate(service, project, subordinate_name , cert_name = _new_cert_name )
                     # Update LB's cert
                     private_ca_update_target_https_proxy_ssl (service, project, target_https_proxy[u'name'] , _new_cert_name)
 

@@ -38,38 +38,57 @@ def main(project , yaml_file):
     data = yaml.safe_load(f)
     f.close()
 
-    print (data)
+    #print (data)
 
     for item_in_yaml in data['ssl_resources']:
-        print (item_in_yaml)
-        name = data['ssl_resources'][item_in_yaml]['name']
+        #print (item_in_yaml)
+        resource_name = data['ssl_resources'][item_in_yaml]['name']
         type = data['ssl_resources'][item_in_yaml]['type']
         subordinate_ca = data['ssl_resources'][item_in_yaml]['subordinate-ca']
         cert_renew_ratio = data['ssl_resources'][item_in_yaml]['subordinate-ca']
-        print (name)
-        print (type)
+        #print (resource_name)
+        #print (type)
 
     # Process resources types
         if type == 'GLB':
-            print ("Procssing {} GLB".format(name))
+            print ("Procssing {} GLB".format(resource_name))
             #read GLB
-            response = private_ca_read_global_target_https(service, project, "demo-lb-target-proxy" )
+            response = private_ca_read_global_target_https(service, project, resource_name)
             #read SSL cert
             ssl_certificate_list = response[u'sslCertificates']
             # process each cert in cert list
             for cert_name in ssl_certificate_list:
-                print (cert_name)
+                #print (cert_name)
                 cert_name = cert_name.split("/")[-1]
                 #print (cert_name)
                 cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
-                print ("Cert: {} , creation: {} ,expire: {}".format(cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime)) # + " creation: " + creation
+                # Calc cert life-time, i.e.: cert-expiraton-date (minus) cert expiration date , keep result in seconds
+                duration = cert_expiration_date_in_datetime - cert_creation_date_in_datetime
+                cert_total_life_time_in_sec = round(duration.total_seconds())
+                #print ("cert_life_time_in_sec = {} ".format(cert_total_life_time_in_sec))
+                
+                #Calc remining life of cert, i.e.: cert-expiraton-date (minus) now, keep result in seconds
+                now = datetime.now()
+                duration = cert_expiration_date_in_datetime - now
+                cert_remaining_time_in_sec = round(duration.total_seconds())
+                
+                print ("Resource: {}, Cert: {} , creation: {} ,expire: {} , cert life time in sec: {:,}, remining time in sec: {:,}".format(resource_name, cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime, cert_total_life_time_in_sec , cert_remaining_time_in_sec)) # + " creation: " + creation
                 if (cert_remaining_time_in_sec<0) or (cert_remaining_time_in_sec*100/cert_total_life_time_in_sec < REMAIN_CERT_LIFE_TIME_RATIO):
                     # Issue new cert, create LB SSL and install new SSL to LB.
-                    print ("Renewing SSL cert for LB " + name)
+                    print ("Renewing SSL cert for LB " + resource_name)
                     _new_cert_name = "cert-" + datetime.now().strftime("%Y%m%d%H%M%S")
-                    private_ca_issue_cert_from_subordinate(service, project, subordinate_name , cert_name = _new_cert_name )
+                    private_ca_issue_LB_cert_from_subordinate(service, project, subordinate_ca , cert_name = _new_cert_name )
                     # Update LB's cert
-                    private_ca_update_target_https_proxy_ssl (service, project, target_https_proxy[u'name'] , _new_cert_name)
+                    private_ca_update_target_https_proxy_ssl (service, project, resource_name , _new_cert_name)
+                    # Check if new cert is slisted in the LB
+                    response = private_ca_read_global_target_https(service, project, resource_name)
+                    #read SSL cert
+                    ssl_certificate_list = response[u'sslCertificates']
+                    print ("Update LB has this SSL cert: " + str(ssl_certificate_list))
+                else:
+                    print ("Cert {}, has {}% of its life, skipping cert renewal!".format(resource_name, round((cert_remaining_time_in_sec*100/cert_total_life_time_in_sec),1)))
+                    print ("-" * 50)
+
 
     exit (1)
     # read all LB in the project

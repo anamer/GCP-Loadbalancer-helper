@@ -9,3 +9,8 @@ ssl_resources:
     name: "demo-lb-target-proxy"
     subordinate-ca: "server-tls-2"
     cert_renew_ratio: 70
+  "prod-load-balancer":
+    type: "GLB" # Global Load Balancer
+    name: "web-map-target-proxy-2"
+    subordinate-ca: "server-tls-2"
+    cert_renew_ratio: 70
