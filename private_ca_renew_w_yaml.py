@@ -12,7 +12,7 @@ import yaml
 from datetime import datetime
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-
+from google.oauth2 import service_account
 
 import googleapiclient.discovery
 from six.moves import input
@@ -26,12 +26,28 @@ from private_ca_functions import *
  # One more example, if REMAIN_CERT_LIFE_TIME_RATIO = 50, if a cert is issued for 30 days, then it will be renewed after 15 days.
 REMAIN_CERT_LIFE_TIME_RATIO = 10
 
-
+# SA_AUTH indicates if the script run from outside the GCP platform, if set to True then the script auth with the patform via 
+# service account keys which are refernced in the "service_account.Credentials.from_service_account_file" API.
+# If the script is executed from a VM in GCP or CloudShell then set this variable to False, in that case the script will inherent the 
+# VM service account.
+# In both cases, the SA or the user needs to have the apprioiate IAM permissions to get & ser SSL certicate on load-balancers and to issue
+# new certiciates from GCP private CA service.
+SA_AUTH = True
 
 
 # [START run]
 def main(project , yaml_file):
-    service = googleapiclient.discovery.build('compute', 'v1')
+
+
+    if (SA_AUTH):
+        credentials = service_account.Credentials.from_service_account_file(
+            '/home/namera/proj-2-SA.json',
+            scopes=["https://www.googleapis.com/auth/cloud-platform"],)
+        service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
+        project = "assafproject-2"
+    else:
+
+        service = googleapiclient.discovery.build('compute', 'v1')
 
     #parse YAML file
     f = open(yaml_file)
@@ -85,10 +101,17 @@ def main(project , yaml_file):
                     #read SSL cert
                     ssl_certificate_list = response[u'sslCertificates']
                     print ("Update LB has this SSL cert: " + str(ssl_certificate_list))
-                    if (_new_cert_name in ssl_certificate_list):
-                        print("Updated LB's SSL Cert successfully")
+                    print ("new cert name = " + _new_cert_name)
+                    update_sucess = False
+                    for cert_name in ssl_certificate_list:
+                        if (_new_cert_name in cert_name):
+                            update_sucess = True
+                            break;
+                    if (update_sucess == True):
+                         print("Updated LB's SSL Cert successfully")
                     else:
-                        print("ERROR: Could not find new SSL cert in LB!")
+                        print("mmmm, Something went wrong ... do some error handling here!")
+
                 else:
                     print ("Cert {}, has {}% of its life, skipping cert renewal!".format(resource_name, round((cert_remaining_time_in_sec*100/cert_total_life_time_in_sec),1)))
                     print ("-" * 50)

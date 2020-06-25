@@ -41,6 +41,7 @@ def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert
     request = service.sslCertificates().insert(project=project, body=ssl_certificate_body)
     response = request.execute()
     pprint (response)
+    print ("done insert new self managed cert : project {}, cert name {}".format(project,cert_name))
     #ToDo return response
 
 
