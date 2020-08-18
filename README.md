@@ -13,7 +13,7 @@ Clone the repository and run the next commands.
 pip3 install -r requirements.txt
 export CLOUDSDK_PYTHON_SITEPACKAGES=1;
  ```
- 
+
 ## Usage:
  ```sh
  Cd GCP-Loadbalancer-helper
@@ -29,8 +29,6 @@ The script assumes all certificates are issued from a pre-configured subordinate
 The script is designed to run as a [cron job ](https://www.hostgator.com/help/article/what-are-cron-jobs), the certificate(s) installed on the resources listed in the YAML configuration file will be queried for certificate life-span and renewed if needed. The frequency in which this script executes depends on the certificates' life-span, for example if the certification are issued for 24 hours and expected to be renewed 6 hours before expiration, then the script should be executed every 4 hours with the following crontab schedule expression: ```0 */4 * * *```. CGP [Cloud Schedule] (https://cloud.google.com/scheduler/docs/creating) is a service that can help in scheduling and managing cron-jobs.
  
  
- 
- 
 ## Architectural overview:
  
 ![Architectural overview](./PrivateCA-AutomationOverview.png)
@@ -38,7 +36,6 @@ The script is designed to run as a [cron job ](https://www.hostgator.com/help/ar
 The YAML file binds between resources on the right (such as load balancer) and a subordinate CA. For example the following snippes bind a global load balancer called “demo-lb-target-proxy” with a subordinate CA “server-tls-2”.
 The cert_renew_ratio indicates the portion of the certification validity time before renewal, for example 70 means that the certificate will be renewed after 70% of its life span (e.g.: if the certificate has been issued for 100 minutes, it will be renewed after 70 minutes).
  
-YAML File configuration:
 ```ssl_resources:
   "load-balancer":
     type: "GLB" #Global Load Balancer
@@ -65,4 +62,6 @@ GCP Secret Manager or Cloud Storage are recommended to store the YAML configurat
  
 ## Auditing and Logging:
 By default GCP Certificate Authority Service logs every operation performed in Cloud Logging, in addition alerts and notifications can be configured based on metrics. For example a notification can be delivered to Pub/Sub anytime Root CA configuration has changed. The script is designed to extend SSL-based resources certification automation and we are welcoming pull requests.
+
+
 

@@ -1,3 +1,17 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 ##################################################################################
 # usage: private-ca-renew-w_yaml.py <project-id> <YAML File>
 # This script assumes all Google Load balancer certs in a project are self-manged.
@@ -28,7 +42,7 @@ REMAIN_CERT_LIFE_TIME_RATIO = 10
 
 # SA_AUTH indicates if the script is executed from outside the GCP platform, if set to True then the script auth with the patform via 
 # service account keys which are refernced in the "service_account.Credentials.from_service_account_file" API.
-# If the script is executed from a VM in GCP or CloudShell then set this variable to False, in that case the script will inherent the 
+# If the script is executed from a VM in GCP or CloudShell then set this variable to False, in that case the script will inherent the
 # VM service account.
 # In both cases, the SA or the user needs to have the apprioiate IAM permissions to get & set SSL certicate on load-balancers and to issue
 # new certiciates from GCP private CA service.
