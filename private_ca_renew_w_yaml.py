@@ -26,13 +26,13 @@ from private_ca_functions import *
  # One more example, if REMAIN_CERT_LIFE_TIME_RATIO = 50, if a cert is issued for 30 days, then it will be renewed after 15 days.
 REMAIN_CERT_LIFE_TIME_RATIO = 10
 
-# SA_AUTH indicates if the script run from outside the GCP platform, if set to True then the script auth with the patform via 
+# SA_AUTH indicates if the script is executed from outside the GCP platform, if set to True then the script auth with the patform via 
 # service account keys which are refernced in the "service_account.Credentials.from_service_account_file" API.
 # If the script is executed from a VM in GCP or CloudShell then set this variable to False, in that case the script will inherent the 
 # VM service account.
-# In both cases, the SA or the user needs to have the apprioiate IAM permissions to get & ser SSL certicate on load-balancers and to issue
+# In both cases, the SA or the user needs to have the apprioiate IAM permissions to get & set SSL certicate on load-balancers and to issue
 # new certiciates from GCP private CA service.
-SA_AUTH = True
+SA_AUTH = False
 
 
 # [START run]
@@ -57,27 +57,38 @@ def main(project , yaml_file):
     #print (data)
 
     for item_in_yaml in data['ssl_resources']:
-        #print (item_in_yaml)
+        print (item_in_yaml)
         resource_name = data['ssl_resources'][item_in_yaml]['name']
         type = data['ssl_resources'][item_in_yaml]['type']
         subordinate_ca = data['ssl_resources'][item_in_yaml]['subordinate-ca']
+        subordinate_ca_region = data['ssl_resources'][item_in_yaml]['subordinate-ca-region']
         cert_renew_ratio = data['ssl_resources'][item_in_yaml]['subordinate-ca']
+        if "region" in data['ssl_resources'][item_in_yaml]:
+            region = data['ssl_resources'][item_in_yaml]['region']
+        else:
+            print ("No region specified, assuming Global")
+            region = "global"
+
         #print (resource_name)
         #print (type)
+        print ("region is:")
+        print (region)
+    
+     
 
     # Process resources types
-        if type == 'GLB':
+        if type == 'GLB' or type == "ILB":
             print ("Procssing {} GLB".format(resource_name))
-            #read GLB
-            response = private_ca_read_global_target_https(service, project, resource_name)
+            #read Load Balancer
+            response = private_ca_read_target_https(service, project, resource_name, region)
             #read SSL cert
             ssl_certificate_list = response[u'sslCertificates']
             # process each cert in cert list
             for cert_name in ssl_certificate_list:
-                #print (cert_name)
+                print (cert_name)
                 cert_name = cert_name.split("/")[-1]
                 #print (cert_name)
-                cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name)
+                cert_expiration_date_in_datetime , cert_creation_date_in_datetime = get_cert_dates (service, project, cert_name, region)
                 # Calc cert life-time, i.e.: cert-expiraton-date (minus) cert expiration date , keep result in seconds
                 duration = cert_expiration_date_in_datetime - cert_creation_date_in_datetime
                 cert_total_life_time_in_sec = round(duration.total_seconds())
@@ -89,15 +100,17 @@ def main(project , yaml_file):
                 cert_remaining_time_in_sec = round(duration.total_seconds())
 
                 print ("Resource: {}, Cert: {} , creation: {} ,expire: {} , cert life time in sec: {:,}, remining time in sec: {:,}".format(resource_name, cert_name, cert_creation_date_in_datetime ,cert_expiration_date_in_datetime, cert_total_life_time_in_sec , cert_remaining_time_in_sec)) # + " creation: " + creation
+                
                 if (cert_remaining_time_in_sec<0) or (cert_remaining_time_in_sec*100/cert_total_life_time_in_sec < REMAIN_CERT_LIFE_TIME_RATIO):
                     # Issue new cert, create LB SSL and install new SSL to LB.
                     print ("Renewing SSL cert for LB " + resource_name)
                     _new_cert_name = "cert-" + datetime.now().strftime("%Y%m%d%H%M%S")
-                    private_ca_issue_LB_cert_from_subordinate(service, project, subordinate_ca , cert_name = _new_cert_name )
+                    private_ca_issue_LB_cert_from_subordinate(service, project, subordinate_ca , subordinate_ca_region=subordinate_ca_region, cert_name = _new_cert_name , lb_region=region)
                     # Update LB's cert
-                    private_ca_update_target_https_proxy_ssl (service, project, resource_name , _new_cert_name)
+                    private_ca_update_target_https_proxy_ssl (service, project, resource_name , _new_cert_name , region)
+                    
                     # Check if new cert is slisted in the LB
-                    response = private_ca_read_global_target_https(service, project, resource_name)
+                    response = private_ca_read_target_https(service, project, resource_name, region)
                     #read SSL cert
                     ssl_certificate_list = response[u'sslCertificates']
                     print ("Update LB has this SSL cert: " + str(ssl_certificate_list))
@@ -115,6 +128,12 @@ def main(project , yaml_file):
                 else:
                     print ("Cert {}, has {}% of its life, skipping cert renewal!".format(resource_name, round((cert_remaining_time_in_sec*100/cert_total_life_time_in_sec),1)))
                     print ("-" * 50)
+
+#        if type == 'ILB':
+#            print ("Processing Internal Load Balancer")
+#            print ("Procssing {} ILB".format(resource_name))
+ #           #read GLB
+
 
 
 
