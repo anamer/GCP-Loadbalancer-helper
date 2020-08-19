@@ -52,6 +52,13 @@ The cert_renew_ratio indicates the portion of the certification validity time be
     region: "us-central1"
 ```
 The YAML file configuration includes the follwing paramaters:
+
+| Paramter      | Description   | 
+| ------------- |:-------------:| 
+| col 3 is      | GLB or ILB | 
+| col 2 is      | Load Balancer name    |   
+| zebra stripes | are neat      |   
+
 **type:**: GLB or ILB 
 
 **name:** Load Balancer name
