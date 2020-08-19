@@ -51,13 +51,21 @@ The cert_renew_ratio indicates the portion of the certification validity time be
     cert_renew_ratio: 50
     region: "us-central1"
 ```
- 
-The example YAML file above lists two GCL load balancers, the external load balancer is donated with type: "GLB" and the internal load balancer denoted with "ILB".
+The YAML file configuration includes the follwing paramaters:
+**type:**: GLB or ILB 
+**name:** Load Balancer name
+**subordinate-ca:** name of an exsisting subordinate CA
+**subordinate-ca-region:** the region of the subordinate CA (can be diffrent than load-balancer)
+**cert_renew_ratio:** The cert life-span % before auto-renewal
+**region:** Load Balancer region (applicable to internal load balancer)
+
+
+The example YAML file above lists two GCL load balancers, the external load balancer is denoted with type: "GLB" and the internal load balancer denoted with "ILB".
 Each load balancer needs to be associated with a subordinate CA (name and region), in addition internal load-balancer needs to include it region, in the example load-balancer-2 is an internal load balancer in us-central1 and it subordinate CA is also in us-central-1.
 The cert_renew_ratio indicates the lifespan of the certificate before the renewal process kicks in, the value is in percentage. In the example above, the GLC certificate will be renewed after 70% of the certificare life, whereas ILB certificate will be renewed at half-time.
  
  
-GCP Secret Manager or Cloud Storage are recommended to store the YAML configuration file.
+It is recomended to store the YAML file in GCP Secret Manager or Cloud Storage with the right access controls.
  
  
 ## Auditing and Logging:
