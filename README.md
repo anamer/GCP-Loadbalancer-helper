@@ -61,17 +61,6 @@ The YAML file configuration includes the follwing paramaters:
 | **cert_renew_ratio:**     | The certification life-span in % before auto-renewal | 
 | **region:**     | Load Balancer region (applicable to internal load balancer) | 
 
-: GLB or ILB 
-
-**name:** Load Balancer name
-
-**subordinate-ca:** name of an exsisting subordinate CA
-
-**subordinate-ca-region:** the region of the subordinate CA (can be diffrent than load-balancer)
-
-**cert_renew_ratio:** The cert life-span % before auto-renewal
-
-**region:** Load Balancer region (applicable to internal load balancer)
 
 
 The example YAML file above lists two GCL load balancers, the external load balancer is denoted with type: "GLB" and the internal load balancer denoted with "ILB".
