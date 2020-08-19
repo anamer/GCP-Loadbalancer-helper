@@ -53,10 +53,15 @@ The cert_renew_ratio indicates the portion of the certification validity time be
 ```
 The YAML file configuration includes the follwing paramaters:
 **type:**: GLB or ILB 
+
 **name:** Load Balancer name
+
 **subordinate-ca:** name of an exsisting subordinate CA
+
 **subordinate-ca-region:** the region of the subordinate CA (can be diffrent than load-balancer)
+
 **cert_renew_ratio:** The cert life-span % before auto-renewal
+
 **region:** Load Balancer region (applicable to internal load balancer)
 
 
