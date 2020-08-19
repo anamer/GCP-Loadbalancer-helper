@@ -55,11 +55,13 @@ The YAML file configuration includes the follwing paramaters:
 
 | Paramter      | Description   | 
 | ------------- |:-------------:| 
-| col 3 is      | GLB or ILB | 
-| col 2 is      | Load Balancer name    |   
-| zebra stripes | are neat      |   
+| **type:**     | GLB or ILB | 
+| **subordinate-ca:**      | Load Balancer name    |   
+| **subordinate-ca-region:** | the region of the subordinate CA (can be diffrent than load-balancer      |   
+| **cert_renew_ratio:**     | The certification life-span in % before auto-renewal | 
+| **region:**     | Load Balancer region (applicable to internal load balancer) | 
 
-**type:**: GLB or ILB 
+: GLB or ILB 
 
 **name:** Load Balancer name
 
