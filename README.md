@@ -20,6 +20,7 @@ export CLOUDSDK_PYTHON_SITEPACKAGES=1;
  python3 private_ca_renew_lb_in_project.py <project-id> <private-ca-subordinate-name>
  ```
  
+ Script can be executed in the GCP (e.g.: on a VM), or outside GCP using service accoount, check the variable SA_AUTH in private_ca_renew_w_yaml.py for more details.
  
 ## Renew Load-Balancers self-managed certifications in a project
 ### Overview:

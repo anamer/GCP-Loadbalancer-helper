@@ -54,13 +54,16 @@ def main(project , yaml_file):
 
 
     if (SA_AUTH):
+        # assuming script runs outside GCP, use a pre-configured ServiceAccount. 
+        # make sure NOT to include credential file in the code or your repo, follow the Service Account best practices.
+        # TODO: move to script input vars
         credentials = service_account.Credentials.from_service_account_file(
             '/home/namera/proj-2-SA.json',
             scopes=["https://www.googleapis.com/auth/cloud-platform"],)
         service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
         project = "assafproject-2"
     else:
-
+        # assuming script runs on GCP and assume the VM (or underlying role)
         service = googleapiclient.discovery.build('compute', 'v1')
 
     #parse YAML file

@@ -21,10 +21,10 @@ ssl_resources:
   "load-balancer-2":
     type: "ILB" # Internal Load Balancer
     name: "ilb-loadbalancer-target-proxy"
-    subordinate-ca: "Joonix-Server-TLS-CA"
+    subordinate-ca: "Joonix-Internal-SubCA" 
     subordinate-ca-region: "us-central1"
     cert_renew_ratio: 70
-    region: "us-central1"
+    region: "us-central1" # Load Balancer region (can be diffrent than subordinate-ca-region )
   "prod-load-balancer":
     type: "GLB" # Global Load Balancer
     name: "web-map-target-proxy-2"

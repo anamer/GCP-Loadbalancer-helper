@@ -15,6 +15,7 @@ from pprint import pprint
 from datetime import datetime
 import os
 
+# List all SSL certs in a project
 def private_ca_list_ssl_certs(service, project):
     # List certs
     request = service.sslCertificates().list(project=project)
@@ -29,8 +30,8 @@ def private_ca_list_ssl_certs(service, project):
     pprint(response)
     return response
 
-#def private_ca_issue_an_apply_cert(service, project, subordinate_name)
 
+# Create new SSL cer from cert and private key - use with extra caution, the private key resides on disk
 def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert_data, private_key_data, _region):
     ssl_certificate_body = {
         "name": cert_name,
@@ -61,10 +62,8 @@ def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert
     print ("done insert new self managed cert : project {}, cert name {}".format(project,cert_name))
     #ToDo return response
 
-
+# Read target https (load balancer) names, if _region is NOT "global" then this is an internal (regional) load-balancer
 def private_ca_read_target_https(service, project, target_https_target_name, _region="global"):
-    print ("in read target")
-    print (_region)
     if (_region == "global"):
         request = service.targetHttpsProxies().get(project=project, targetHttpsProxy=target_https_target_name)
     else:
@@ -78,7 +77,7 @@ def private_ca_read_target_https(service, project, target_https_target_name, _re
 
 
 
-
+# TODO: this function should be modified as soon as CA Service Python SDK becomes avaliable.
 def private_ca_issue_LB_cert_from_subordinate(service, project, private_ca_subodinate, cert_name, san = "www.joonix.net", reusable_config = "leaf-server-tls", subordinate_ca_region="us-west1", lb_region="global" ):
     # given a project name, private ca subordinate and desired cert_name issue new cert
    
@@ -116,9 +115,8 @@ def private_ca_issue_LB_cert_from_subordinate(service, project, private_ca_subod
     os.remove("key")
 
 
-
+#TODO: to be replaced with CA service Python SDK 
 def private_ca_update_target_https_proxy_ssl (service, project, https_proxy_name, cert_name, _region="global"):
-    #TODO: to be replaced with Python SDK
     if (_region == "global"):
         command_region = "" ; # the default is global so we don't need to add anything
     else:
@@ -130,11 +128,13 @@ def private_ca_update_target_https_proxy_ssl (service, project, https_proxy_name
 
     execute_shell_command (_shell_command)
 
+#TODO: to be rmoved as soon as gcloud cli is not used.
 def execute_shell_command(bashCommand):
     # TODO: Add try - catch, consider subprocess
     print (bashCommand)
     os.system(bashCommand)
 
+# Given a cert return cert's creation and expiration time
 def get_cert_dates(service, project, cert_name, _region):
     if (_region == "global"):
         cert_request = service.sslCertificates().get(project=project, sslCertificate=cert_name)
@@ -153,16 +153,11 @@ def get_cert_dates(service, project, cert_name, _region):
     #print cert_expiration_date
     cert_expiration_date_in_datetime = datetime.strptime(cert_expiration_date, date_format)
     cert_expi_for_print = cert_expiration_date_in_datetime.strftime("%m/%d/%Y, %H:%M:%S")
-    #print ("Cert Expiration Date2: ")
-    #print (cert_expiration_date_in_datetime)
-
+ 
     cert_creation_date = cert_response[u'creationTimestamp']
     split_string = cert_creation_date.split(".", 1)
     cert_creation_date = split_string[0]
     cert_creation_date_in_datetime = datetime.strptime(cert_creation_date, date_format)
-    cert_creation_for_print = cert_creation_date_in_datetime.strftime("%m/%d/%Y, %H:%M:%S")
-    #print ("Cert Creation Date: ")
-    #print (cert_creation_date_in_datetime)
-
-    #return cert_response[u'expireTime'], cert_response[u'creationTimestamp']
+    #cert_creation_for_print = cert_creation_date_in_datetime.strftime("%m/%d/%Y, %H:%M:%S")
+ 
     return cert_expiration_date_in_datetime , cert_creation_date_in_datetime
