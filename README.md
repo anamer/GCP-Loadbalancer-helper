@@ -75,5 +75,6 @@ It is recomended to store the YAML file in GCP Secret Manager or Cloud Storage w
 ## Auditing and Logging:
 By default GCP Certificate Authority Service logs every operation performed in Cloud Logging, in addition alerts and notifications can be configured based on metrics. For example a notification can be delivered to Pub/Sub anytime Root CA configuration has changed. The script is designed to extend SSL-based resources certification automation and we are welcoming pull requests.
 
+[ToDo: Add links to docs with details about logs] 
 
 
