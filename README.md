@@ -1,5 +1,7 @@
 # GCP-CA-Service-Helper-Scripts
  
+> This is not an officially supported Google product
+
 This repository includes helper scripts for the Google Cloud Certificate Authority Service. Currently the script supports GCP Load Balancer Auto-Renewal.
  
 ## System requirements
@@ -27,7 +29,7 @@ export CLOUDSDK_PYTHON_SITEPACKAGES=1;
 This script rotates load balancers SSL certificates when the certificate's remaining cert-life is less than a threshold. For example, if the remaining cert-life threshold is set to  50%, then a 30 days cert will be renewed 15 days before expiration. If the remaining cert life threshold is set to 90%, then a 24hrs cert will be renewed 2.4hrs before certification expiration.
 The script assumes all certificates are issued from a pre-configured subordinate CAs which are listed in YAML file.
  
-The script is designed to run as a [cron job ](https://www.hostgator.com/help/article/what-are-cron-jobs), the certificate(s) installed on the resources listed in the YAML configuration file will be queried for certificate life-span and renewed if needed. The frequency in which this script executes depends on the certificates' life-span, for example if the certification are issued for 24 hours and expected to be renewed 6 hours before expiration, then the script should be executed every 4 hours with the following crontab schedule expression: ```0 */4 * * *```. CGP [Cloud Schedule] (https://cloud.google.com/scheduler/docs/creating) is a service that can help in scheduling and managing cron-jobs.
+The script is designed to run as a [cron job ](https://www.hostgator.com/help/article/what-are-cron-jobs), the certificate(s) installed on the resources listed in the YAML configuration file will be queried for certificate life-span and renewed if needed. The frequency in which this script executes depends on the certificates' life-span, for example if the certification are issued for 24 hours and expected to be renewed 6 hours before expiration, then the script should be executed every 4 hours with the following crontab schedule expression: ```0 */4 * * *```. CGP [Cloud Schedule](https://cloud.google.com/scheduler/docs/creating) is a service that can help in scheduling and managing cron-jobs.
  
  
 ## Architectural overview:
