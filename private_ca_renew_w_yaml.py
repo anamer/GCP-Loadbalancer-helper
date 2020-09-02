@@ -32,6 +32,7 @@ import googleapiclient.discovery
 from six.moves import input
 from pprint import pprint
 from private_ca_functions import *
+import logging
 
  # REMAIN_CERT_LIFE_TIME_RATIO is the remining precentage cert life span to renew
  # for example if the value is 40, then the cert will be renewed when it has less than 40% from
@@ -52,13 +53,13 @@ SA_AUTH = False
 # [START run]
 def main(project , yaml_file):
 
-
     if (SA_AUTH):
         # assuming script runs outside GCP, use a pre-configured ServiceAccount. 
         # make sure NOT to include credential file in the code or your repo, follow the Service Account best practices.
+        # It's better to keep the service account keys in Secret Manager (https://cloud.google.com/secret-manager) or Vault
         # TODO: move to script input vars
         credentials = service_account.Credentials.from_service_account_file(
-            '/home/namera/proj-2-SA.json',
+            '/home/namera/proj-2-SA.json', # NEVER EMBED SERVICE-ACCOUNT CREDS IN CODE
             scopes=["https://www.googleapis.com/auth/cloud-platform"],)
         service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
         project = "assafproject-2"
@@ -71,7 +72,7 @@ def main(project , yaml_file):
     data = yaml.safe_load(f)
     f.close()
 
-    #print (data)
+    
 
     for item_in_yaml in data['ssl_resources']:
         print (item_in_yaml)
@@ -88,9 +89,8 @@ def main(project , yaml_file):
 
         #print (resource_name)
         #print (type)
-        print ("region is:")
-        print (region)
-    
+        print ("region is: {}".format(region))
+        
      
 
     # Process resources types
@@ -163,8 +163,6 @@ if __name__ == '__main__':
     parser.add_argument('yaml_file', help='Path to YAMl file')
 
     args = parser.parse_args()
-    #print (args.subordinate_name)
-
-
+        
     main(args.project_id , args.yaml_file)
 # [END run]

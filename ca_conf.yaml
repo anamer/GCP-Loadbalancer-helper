@@ -15,7 +15,7 @@ ssl_resources:
   "load-balancer":
     type: "GLB" #Global Load Balancer
     name: "demo-lb-target-proxy"
-    subordinate-ca: "server-tls-2"
+    subordinate-ca: "Joonix-External-SubCA"
     subordinate-ca-region: "us-west1"
     cert_renew_ratio: 70
   "load-balancer-2":
@@ -28,6 +28,6 @@ ssl_resources:
   "prod-load-balancer":
     type: "GLB" # Global Load Balancer
     name: "web-map-target-proxy-2"
-    subordinate-ca: "server-tls-2"
+    subordinate-ca: "Joonix-External-SubCA"
     subordinate-ca-region: "us-west1"
     cert_renew_ratio: 70

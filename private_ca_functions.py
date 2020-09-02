@@ -21,13 +21,13 @@ def private_ca_list_ssl_certs(service, project):
     request = service.sslCertificates().list(project=project)
     while request is not None:
         response = request.execute()
-        for ssl_certificate in response['items']:
+        #for ssl_certificate in response['items']:
             # TODO: Change code below to process each `ssl_certificate` resource:
-            pprint(ssl_certificate)
+            #logging.info() pprint(ssl_certificate))
         request = service.sslCertificates().list_next(previous_request=request, previous_response=response)
 
     # TODO: Change code below to process the `response` dict:
-    pprint(response)
+    #pprint(response)
     return response
 
 
@@ -58,8 +58,8 @@ def private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, cert
     else:
         request = service.regionSslCertificates().insert(project=project, body=ssl_certificate_body , region=_region)
     response = request.execute()
-    pprint (response)
-    print ("done insert new self managed cert : project {}, cert name {}".format(project,cert_name))
+    #pprint (response)
+    #logging.info ("done insert new self managed cert : project {}, cert name {}".format(project,cert_name))
     #ToDo return response
 
 # Read target https (load balancer) names, if _region is NOT "global" then this is an internal (regional) load-balancer
@@ -71,7 +71,7 @@ def private_ca_read_target_https(service, project, target_https_target_name, _re
     response = request.execute()
 
     # TODO: Change code below to process the `response` dict:
-    pprint(response)
+    #pprint(response)
     return response
 
 
@@ -107,7 +107,7 @@ def private_ca_issue_LB_cert_from_subordinate(service, project, private_ca_subod
 
 
     # Now that we have cert and private_key create a new LB SSL-cert
-    print ("in private_ca_issue_LB_cert_from_subordinate region is: " + lb_region)
+    #logging.info ("in private_ca_issue_LB_cert_from_subordinate region is: " + lb_region)
     private_ca_insert_new_self_managed_LB_cert(service, project, cert_name, _temp_cert, _temp_key , lb_region)
 
     #remove temp cert and _temp_key
