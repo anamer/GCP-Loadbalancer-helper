@@ -18,7 +18,7 @@ export CLOUDSDK_PYTHON_SITEPACKAGES=1;
 
 ## Usage:
  ```sh
- Cd GCP-Loadbalancer-helper
+ cd GCP-Loadbalancer-helper
  python3 private_ca_renew_lb_in_project.py <project-id> <private-ca-subordinate-name>
  ```
  
