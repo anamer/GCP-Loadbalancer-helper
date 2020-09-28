@@ -1,6 +1,8 @@
 # GCP-CA-Service-Helper-Scripts
  
-> This is not an officially supported Google product
+> This is not an officially supported Google product.
+> This code uses the [gcloud](https://cloud.google.com/sdk/gcloud) command which opens a subprocess (command shell), this will be changed as soon as an official Python API for GCP Service becomes available.
+
 
 This repository includes helper scripts for the Google Cloud Certificate Authority Service. Currently the script supports GCP Load Balancer Auto-Renewal.
  
